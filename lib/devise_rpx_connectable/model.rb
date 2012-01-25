@@ -140,9 +140,12 @@ module Devise #:nodoc:
               
             if !user and attributes[:email]
               if user = self.find_by_email(attributes[:email])
-				user.identities.new(:identifier => attributes[:identifier]) #build_identity?
-				user.save!
-			  end
+				        user.identities.create!(  :identifier => attributes[:identifier],
+                                          :user_url   => attributes[:url],
+                                          :provider   => attributes[:providerName],
+                                          :photo_url  => attributes[:photo],
+                                          :user_name  => attributes[:username] )
+			        end
             end
             
             return user
@@ -159,12 +162,8 @@ module Devise #:nodoc:
         # namedscope to filter records while authenticating.
         #
         def find_for_rpx(identifier)
-          #self.first(:conditions =>  { rpx_identifier_field => identifier })
-		  @identity = Identity.first(:conditions => ["identifier = ?", identifier])
-		  if @identity
-		    return self.find @identity.user_id
-		  end
-		  return false
+		      identity = Identity.first(:conditions => ["identifier = ?", identifier])
+		      identity.try(:user)
         end
 
         # Contains the logic used in authentication. Overwritten by other devise modules.

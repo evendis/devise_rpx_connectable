@@ -33,13 +33,14 @@ module Devise #:nodoc:
             user = klass.new
             user.store_rpx_credentials!(rpx_data)
             user.on_before_rpx_auto_create(rpx_data)
-            
-			# TODO: create a random password here and email the user if we can so that we can check the validations
-			# if the user doesn't have an email, set it to none@none.none and blank the password and salt
+
             user.save(:validate => false)
-			i = Identity.new(:identifier => rpx_data[:identifer])
-			i.save! if i.save # if we got an error with this, it's fine; we can work through it.
-			user.on_before_rpx_success(rpx_data)
+			      user.identities.create!(:identifier => rpx_data[:identifier],
+                                    :user_url   => rpx_data[:url],
+                                    :provider   => rpx_data[:providerName],
+                                    :photo_url  => rpx_data[:photo],
+                                    :user_name  => rpx_data[:username] )
+            user.on_before_rpx_success(rpx_data)
             success!(user) and return
             
           rescue
