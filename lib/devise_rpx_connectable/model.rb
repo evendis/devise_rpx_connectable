@@ -37,7 +37,7 @@ module Devise #:nodoc:
         self.skip_confirmation! if self.respond_to?(:skip_confirmation!)
 
         # Only populate +email+ field if it's available (e.g. if +authenticable+ module is used).
-        self.email = attributes[:email] || '' if self.respond_to?(:email)
+        self.email = attributes[:email] || "#{attributes[:provider]}_#{attributes[:username]}" if self.respond_to?(:email)
 
         # Lazy hack: These database fields are required if +authenticable+/+confirmable+
         # module(s) is used. Could be avoided with :null => true for authenticatable
